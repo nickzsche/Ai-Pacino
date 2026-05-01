@@ -1,0 +1,9 @@
+pre-commit:
+  parallel: true
+  commands:
+    biome:
+      glob: "*.{ts,tsx,json}"
+      run: bunx biome check --no-errors-on-unmatched {staged_files}
+    test:
+      run: >-
+        if find src tests \( -name '*.test.ts' -o -name '*.test.tsx' -o -name '*.spec.ts' -o -name '*.spec.tsx' \) 2>/dev/null | grep -q .; then bun test --bail; fi

@@ -1,0 +1,31 @@
+{
+  "name": "aipacino",
+  "version": "0.0.1",
+  "description": "AI Pacino — terminal AI coding companion",
+  "type": "module",
+  "module": "src/index.ts",
+  "bin": { "aipacino": "./src/index.ts" },
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "dev": "bun --watch run src/index.ts",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "lint": "biome check src tests",
+    "format": "biome format --write src tests",
+    "build": "bun build src/index.ts --compile --outfile dist/aipacino"
+  },
+  "dependencies": {
+    "ink": "^5.0.1",
+    "react": "^18.3.1",
+    "zod": "^3.23.8",
+    "marked": "^14.1.2",
+    "marked-terminal": "^7.1.0",
+    "ulid": "^2.3.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/react": "^18.3.10",
+    "ink-testing-library": "^4.0.0",
+    "lefthook": "^1.7.18"
+  }
+}
