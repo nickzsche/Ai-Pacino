@@ -19,6 +19,7 @@ interface Props {
   sessionStore: SessionStore
   contextWindow: number
   maxTokens: number
+  system?: string
   logger: Logger
   onQuit(): void
 }
@@ -30,6 +31,7 @@ export const App: React.FC<Props> = ({
   sessionStore,
   contextWindow,
   maxTokens,
+  system,
   logger,
   onQuit,
 }) => {
@@ -103,6 +105,7 @@ export const App: React.FC<Props> = ({
       for await (const chunk of provider.streamMessage({
         model: state.currentModel,
         messages: trimmed,
+        system,
         maxTokens,
       })) {
         if (chunk.type === 'text') {
