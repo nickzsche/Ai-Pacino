@@ -24,11 +24,16 @@ export class AnthropicProvider implements Provider {
 
   async *streamMessage(opts: StreamOptions): AsyncIterable<StreamChunk> {
     const url = `${this.opts.baseUrl}/v1/messages`
+    // Messages API has no per-message `system` role: fold system messages into the top-level field, never drop them.
+    const systemMessages = opts.messages.filter((m) => m.role === 'system')
+    const system = [opts.system, ...systemMessages.map((m) => m.content)]
+      .filter((s): s is string => typeof s === 'string' && s.length > 0)
+      .join('\n\n')
     const body = JSON.stringify({
       model: opts.model,
       max_tokens: opts.maxTokens,
       stream: true,
-      system: opts.system,
+      system,
       messages: opts.messages.filter((m) => m.role !== 'system'),
     })
 

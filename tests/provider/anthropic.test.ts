@@ -47,6 +47,32 @@ describe('AnthropicProvider', () => {
     expect(chunks[chunks.length - 1]!.type).toBe('done')
   })
 
+  it('folds system-role messages into the top-level system field instead of dropping them', async () => {
+    let sentBody: { system?: string; messages?: { role: string }[] } = {}
+    const events = [`message_stop|${JSON.stringify({ type: 'message_stop' })}`]
+    globalThis.fetch = mock(async (_url: string, init: RequestInit) => {
+      sentBody = JSON.parse(init.body as string)
+      return mockSseResponse(events)
+    }) as never
+
+    const p = new AnthropicProvider({ apiKey: 'sk-test', baseUrl: 'https://api.anthropic.com' })
+    await collect(
+      p.streamMessage({
+        model: 'claude-sonnet-4-6',
+        system: 'base prompt',
+        messages: [
+          { role: 'system', content: '[5 earlier messages truncated]' },
+          { role: 'user', content: 'Hi' },
+        ],
+        maxTokens: 100,
+      }),
+    )
+
+    expect(sentBody.system).toContain('base prompt')
+    expect(sentBody.system).toContain('[5 earlier messages truncated]')
+    expect(sentBody.messages!.every((m) => m.role === 'user' || m.role === 'assistant')).toBe(true)
+  })
+
   it('emits error chunk on 401', async () => {
     globalThis.fetch = mock(
       async () => new Response('{"error":{"message":"invalid key"}}', { status: 401 }),
