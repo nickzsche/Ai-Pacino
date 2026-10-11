@@ -40,4 +40,15 @@ describe('truncateForContext', () => {
     })
     expect(messages[messages.length - 1]).toBe(huge)
   })
+
+  it('never leaves a truncated request starting on an assistant turn', () => {
+    const msgs = make(5) // [user, assistant, user, assistant, user], ~100 tokens each
+    const { messages, truncated } = truncateForContext(msgs, {
+      contextWindow: 250,
+      reserveOutput: 0,
+    })
+    expect(truncated).toBeGreaterThan(0)
+    expect(messages[0]!.role).toBe('system')
+    expect(messages[1]!.role).toBe('user')
+  })
 })
